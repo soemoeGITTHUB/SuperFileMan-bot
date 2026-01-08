@@ -8,6 +8,8 @@ import traceback
 import asyncio
 import datetime
 import aiofiles
+from flask import Flask
+import threading
 from random import choice
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -16,6 +18,21 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, Usern
     PeerIdInvalid
 from configs import Config
 from database import Database
+
+# --- KOYEB HEALTH CHECK SERVICE ---
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return "Bot is running!", 200
+
+def run_flask():
+    # This keeps the Koyeb 'Web Service' happy
+    app.run(host='0.0.0.0', port=8000)
+
+# Start the health check in a separate thread
+threading.Thread(target=run_flask, daemon=True).start()
+# ----------------------------------
 
 BOT_USERNAME = Config.BOT_USERNAME
 BOT_TOKEN = Config.BOT_TOKEN
